@@ -272,6 +272,4 @@ void GRAFO::ComponentesFuertementeConexas()
     }
 }
 
-//La Modificación es comprobar si puede haber una componente conexa que pueda ser dirigida.
-
 // Añadir criterio de parada si el grafo no es conexo
