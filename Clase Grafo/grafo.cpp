@@ -271,5 +271,101 @@ void GRAFO::ComponentesFuertementeConexas()
         }
     }
 }
+// Buscar representante del conjunto
+int buscar(vector<int> &padre, int i)
+{
+    if (padre[i] != i)
+        padre[i] = buscar(padre, padre[i]);
+    return padre[i];
+}
 
+// Unir dos conjuntos
+void unir(vector<int> &padre, int a, int b)
+{
+    a = buscar(padre, a);
+    b = buscar(padre, b);
+    padre[a] = b;
+}
+
+void GRAFO::Sollin()
+{
+    if (dirigido == 1)
+    {
+        cout << "El grafo es dirigido, no se puede aplicar Sollin" << endl;
+        return;
+    }
+
+    vector<int> padre(n);
+    vector<int> mejor(n);
+
+    // inicializar cada nodo como propia componente
+    for (unsigned i = 0; i < n; i++)
+        padre[i] = i;
+
+    int num_componentes = n;
+    int coste_total = 0;
+
+    while (num_componentes > 1)
+    {
+        // reiniciar mejores aristas
+        for (unsigned i = 0; i < n; i++)
+            mejor[i] = -1;
+
+        // buscar mejor arista para cada componente
+        for (unsigned i = 0; i < n; i++)
+        {
+            for (unsigned k = 0; k < LS[i].size(); k++)
+            {
+                unsigned j = LS[i][k].j;
+                int coste = LS[i][k].c;
+
+                int comp_i = buscar(padre, i);
+                int comp_j = buscar(padre, j);
+
+                if (comp_i == comp_j) continue;
+
+                // guardar mejor arista
+                if (mejor[comp_i] == -1 || coste < LS[mejor[comp_i]][0].c)
+                    mejor[comp_i] = i;
+
+                if (mejor[comp_j] == -1 || coste < LS[mejor[comp_j]][0].c)
+                    mejor[comp_j] = j;
+            }
+        }
+
+        // unir componentes
+        for (unsigned i = 0; i < n; i++)
+        {
+            if (mejor[i] != -1)
+            {
+                unsigned u = mejor[i];
+
+                for (unsigned k = 0; k < LS[u].size(); k++)
+                {
+                    unsigned j = LS[u][k].j;
+                    int coste = LS[u][k].c;
+
+                    int comp_u = buscar(padre, u);
+                    int comp_j = buscar(padre, j);
+
+                    if (comp_u != comp_j)
+                    {
+                        // añadir arista al MST
+                        cout << u + 1 << " - " << j + 1
+                             << " (coste " << coste << ")" << endl;
+
+                        coste_total += coste;
+
+                        unir(padre, comp_u, comp_j);
+                        num_componentes--;
+
+                        break; // solo una arista por componente
+                    }
+                }
+            }
+        }
+    }
+
+    cout << "Coste total: " << coste_total << endl;
+}
 // Añadir criterio de parada si el grafo no es conexo

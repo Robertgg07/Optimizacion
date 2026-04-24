@@ -58,6 +58,7 @@ public:
     void ComponentesConexas();
     void ComponentesFuertementeConexas();
     ~GRAFO();
+    void Sollin();
 };
 
 #endif
