@@ -6,34 +6,26 @@
  *               Cursos  : 2025-26
  */
 
-#include <string.h>
+#include <iostream>
+#include <cstring>
 #include "grafo.h"
 
-void pressanykey()
-{   
-    char c;
-    cout << endl;
-    cout << "pulsa [c] para continuar: ";
-    cin >> c;
-}
+using namespace std;
 
-void menu (unsigned dirigido, char &opcion)
-// Expresión del menú según sea dirigido o no dirigido
+void menu(unsigned dirigido, char &opcion)
 {
     cout << "c. [c]argar grafo desde fichero" << endl;
+    cout << "i. Mostrar [i]nformacion basica del grafo" << endl;
 
-    if (dirigido == 0) // NO dirigido
+    if (!dirigido)
     {
-        cout << "i. Mostrar [i]nformacion basica del grafo" << endl;
         cout << "a. Mostrar la lista de [a]dyacencia del grafo" << endl;
-        cout << "x. Componentes cone[x]as" << endl;
+        cout << "r. Bosque de Prim de Coste Mínimo\n" << endl;
     }
-    else // DIRIGIDO
+    else
     {
-        cout << "i. Mostrar [i]nformacion basica del grafo" << endl;
         cout << "s. Mostrar la lista de [s]ucesores del grafo" << endl;
         cout << "p. Mostrar la lista de [p]redecesores del grafo" << endl;
-        cout << "f. Componentes [f]uertemente conexas" << endl;
     }
 
     cout << "q. Finalizar el programa" << endl;
@@ -41,108 +33,36 @@ void menu (unsigned dirigido, char &opcion)
     cin >> opcion;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    int error_apertura;
-    char nombrefichero[85], opcion;
+    int error;
+    char fichero[85], opcion;
 
-    clrscr();
+    cout << "Introduzca el nombre del fichero con el grafo: ";
+    cin >> fichero;
 
-    // Carga inicial
-    if (argc > 1)
+    GRAFO G(fichero, error);
+
+    if (error)
     {
-        cout << "Cargando datos desde el fichero dado como argumento" << endl;
-        strcpy(nombrefichero, argv[1]);
-    }
-    else
-    {
-        cout << "Introduce el nombre completo del fichero de datos" << endl;
-        cin >> nombrefichero;
+        cout << "Introduzca el nombre correctamente del fichero con el grafo: \n";
+        return 0;
     }
 
-    GRAFO G(nombrefichero, error_apertura);
-
-    if (error_apertura == 1)
+    do
     {
-        cout << "Error en la apertura del fichero: revisa nombre y formato" << endl;
-        pressanykey();
-        clrscr();
-    }
-    else
-    {
-        cout << "Grafo cargado desde el fichero " << nombrefichero << endl;
-        pressanykey();
-        clrscr();
+        menu(G.Es_dirigido(), opcion);
 
-        do
+        switch (opcion)
         {
-            menu(G.Es_dirigido(), opcion);
+        case 'i': G.Info_Grafo(); break;
+        case 'a': G.Mostrar_Listas(0); break;
+        case 's': G.Mostrar_Listas(1); break;
+        case 'p': G.Mostrar_Listas(-1); break;
+        case 'r': G.Prim(); break;
+        }
 
-            switch (opcion)
-            {
-                case 'c':
-                    clrscr();
-                    cout << "Introduce el nombre completo del fichero de datos" << endl;
-                    cin >> nombrefichero;
+    } while (opcion != 'q');
 
-                    G.actualizar(nombrefichero, error_apertura);
-
-                    if (error_apertura == 1)
-                        cout << "Error en la apertura del fichero" << endl;
-                    else
-                        cout << "Fichero cargado correctamente" << endl;
-
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 'i':
-                    clrscr();
-                    cout << "Grafo cargado desde " << nombrefichero << endl;
-                    G.Info_Grafo();
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 'a': // NO DIRIGIDO
-                    clrscr();
-                    G.Mostrar_Listas(0);
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 's': // DIRIGIDO
-                    clrscr();
-                    G.Mostrar_Listas(1);
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 'p': // DIRIGIDO
-                    clrscr();
-                    G.Mostrar_Listas(-1);
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 'x': // COMPONENTES CONEXAS
-                    clrscr();
-                    G.ComponentesConexas();
-                    pressanykey();
-                    clrscr();
-                    break;
-
-                case 'f': // COMPONENTES FUERTEMENTE CONEXAS
-                    clrscr();
-                    G.ComponentesFuertementeConexas();
-                    pressanykey();
-                    clrscr();
-                    break;
-            }
-
-        } while (opcion != 'q');
-    }
-
-    cout << "Fin del programa" << endl;
     return 0;
 }
